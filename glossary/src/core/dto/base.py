@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import List
-from core.entity.base import Priority, Tag
+from glossary.src.core.entity.base import Priority, Tag
 
 @dataclass
 class CreateTagDTO:
@@ -25,3 +25,8 @@ class UpdateWordDTO:
     description: str
     tag_ids: List[int]
     priority_id: int
+
+@dataclass
+class CreateUserDTO:
+    name: str
+    password: str

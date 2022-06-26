@@ -19,3 +19,9 @@ class Word:
     description: str
     tags: List[Tag]
     priority: Priority
+
+@dataclass
+class User:
+    id: int
+    name: str
+    password: str
