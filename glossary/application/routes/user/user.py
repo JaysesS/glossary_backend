@@ -22,7 +22,7 @@ router = APIRouter(
 @router.post("/register")
 async def register():
     repo = UserRepo(session = next(db.session))
-    print(repo.register(CreateUserDTO(name="shrek", password="123")))
+    print(repo.save(CreateUserDTO(name="shrek", password="123")))
     return 123
     
 # @router.post("/login")

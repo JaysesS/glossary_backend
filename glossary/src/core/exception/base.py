@@ -6,3 +6,6 @@ class DomainError(Exception):
 
 class RepoError(DomainError):
     """ """
+
+class AuthError(DomainError):
+    """"""
