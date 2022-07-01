@@ -18,10 +18,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from glossary.src.data.repo.priority.models import *
-from glossary.src.data.repo.tag.models import *
-from glossary.src.data.repo.word.models import *
-from glossary.src.data.repo.user.models import *
+from glossary.src.data.repo.models import *
 from glossary.application.database.holder import Base
 target_metadata = Base.metadata
 
