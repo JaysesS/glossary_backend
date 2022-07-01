@@ -1,8 +1,8 @@
-from typing import Union
-from fastapi import APIRouter, Body, HTTPException, Header
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 from glossary.application.database.holder import db
 from glossary.src.core.services.jwt_auth import auth_service
 from glossary.src.core.dto.base import CreateUserDTO
@@ -13,6 +13,8 @@ router = APIRouter(
     prefix="/user",
     tags=["User"]
 )
+
+auth_scheme = HTTPBearer()
 
 class UserSchema(BaseModel):
     name: str = Field(description="Username", max_length=30, min_length=5)
@@ -49,15 +51,18 @@ def login(user_data: UserSchema = Body()):
     return JSONResponse(content=jsonable_encoder(LoginResponce(token=token)))
 
 @router.get("/me", response_model=UserSchemaResponce)
-def me(authorization: Union[str, None] = Header(default=None)):
-    if authorization is None:
-        raise HTTPException(status_code=401, detail="Token not found")
+def me(authorization: HTTPAuthorizationCredentials = Depends(auth_scheme)):
     try:
-        user_id = auth_service.get_user_id(token=authorization)
-        repo = UserRepo(session = next(db.session))
-        user = repo.get(id=user_id)
-    except (AuthError, RepoError) as err:
+        user_id = auth_service.get_user_id(token=authorization.credentials)
+    except AuthError as err:
         raise HTTPException(status_code=401, detail=str(err))
+    
+    repo = UserRepo(session = next(db.session))
+    try:
+        user = repo.get(id=user_id)
+    except RepoError as err:
+        raise HTTPException(status_code=500, detail=str(err))
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found, probably deleted")
     return JSONResponse(content=jsonable_encoder(user))

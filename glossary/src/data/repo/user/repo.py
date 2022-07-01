@@ -24,11 +24,14 @@ class UserRepo(IUserRepo):
             r = self.session.execute(stmt).scalar_one()
             self.session.commit()
         except Exception as err:
-            raise RepoError(f"Error on save user") from err
+            raise RepoError("Error on save user") from err
         return User(id=r, name=user.name, password=user.password)
 
     def get(self, id: int) -> Optional[User]:
-        r = self.session.query(UserModel).get(id)
+        try:
+            r = self.session.query(UserModel).get(id)
+        except Exception:
+            raise RepoError("Error on get user")
         if not r:
             return None
         return User(id=r.id, name=r.name, password=r.password)
