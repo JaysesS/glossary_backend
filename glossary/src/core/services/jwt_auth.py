@@ -1,5 +1,6 @@
 import jwt
 from datetime import datetime, timedelta
+from glossary.src.core.entity.base import User
 from glossary.src.core.exception.base import AuthError
 from glossary.application.settings import get_settings
 from glossary.src.core.interfaces.repo.iuser import IUserRepo
@@ -23,11 +24,10 @@ class AuthJWTService(IAuthService):
         try:
             payload = jwt.decode(token, self.secret, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
-            raise AuthError("Fail verify signature")
+            raise AuthError("Token expired")
+        except Exception:
+            raise AuthError("Fail on verify token signature")
         user_id = payload["user_id"]
-        expires_in = payload["exp"]
-        if int(datetime.now().timestamp()) > expires_in:
-            raise AuthError("Fail verify exp time")
         return user_id
 
     def login(self, name: str, password: str, repo: IUserRepo) -> str:
@@ -38,13 +38,16 @@ class AuthJWTService(IAuthService):
             raise AuthError("Credential error")
         token = self._generate_token(user_id=user.id)
         return token
+
+    def get_user_id(self, token: str) -> int:
+        return self._verify_token(token=token)
     
-    def check(self, token: str, repo: IUserRepo) -> bool:
+    def check(self, token: str, repo: IUserRepo) -> User:
         user_id = self._verify_token(token=token)
         user = repo.get(user_id)
         if not user:
             raise AuthError("Payload fail")
-        return True
+        return user
 
 settings = get_settings()
 

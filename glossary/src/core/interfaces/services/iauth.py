@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from glossary.src.core.entity.base import User
 from glossary.src.core.interfaces.repo.iuser import IUserRepo
 
 
@@ -18,7 +19,11 @@ class IAuthService(ABC):
     @abstractmethod
     def login(self, name: str, password: str, repo: IUserRepo) -> str:
         pass
+
+    @abstractmethod
+    def get_user_id(self, token) -> int:
+        pass
     
     @abstractmethod
-    def check(self, token: str, repo: IUserRepo) -> bool:
+    def check(self, token: str, repo: IUserRepo) -> User:
         pass
