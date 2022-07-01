@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from glossary.src.core.entity.base import Priority
 from glossary.src.core.exception.base import RepoError
 from glossary.src.core.interfaces.repo.ipriority import IPriorityRepo
-from glossary.src.data.repo.priority.models import PriorityModel
+from glossary.src.data.repo.models import PriorityModel
 
 class PriorityRepo(IPriorityRepo):
 
