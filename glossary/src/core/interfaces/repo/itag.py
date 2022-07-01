@@ -7,7 +7,7 @@ from glossary.src.core.entity.base import Tag
 class ITagRepo(ABC):
 
     @abstractmethod
-    def create(self, tag: CreateTagDTO) -> Tag:
+    def save(self, tag: CreateTagDTO) -> Tag:
         pass
 
     @abstractmethod
