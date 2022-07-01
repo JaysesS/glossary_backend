@@ -32,6 +32,4 @@ def create_app():
 
     include_rotes(app, settings.GLOBAL_PREFIX_URL)
 
-    
-
     return app

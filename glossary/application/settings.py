@@ -5,7 +5,7 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     TITLE: str = "GLOSSATY APP"
-    GLOBAL_PREFIX_URL: str = "/api/v1"
+    GLOBAL_PREFIX_URL: str = "/api"
     SECRET_KEY: str =  os.getenv("SECRET_KEY", "abobus")
 
     DB_HOST: str = os.getenv("DB_HOST", "localhost")
