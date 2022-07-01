@@ -1,11 +1,11 @@
 from typing import Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 from glossary.src.core.dto.base import CreateUserDTO
 from glossary.src.core.entity.base import User
 from glossary.src.core.exception.base import RepoError
 from glossary.src.core.interfaces.repo.iuser import IUserRepo
-from glossary.src.data.repo.user.models import UserModel
+from glossary.src.data.repo.models import UserModel
 
 class UserRepo(IUserRepo):
 
@@ -20,15 +20,25 @@ class UserRepo(IUserRepo):
         ).returning(
             UserModel.id
         )
-        r = self.session.execute(stmt).scalar_one()
         try:
+            r = self.session.execute(stmt).scalar_one()
             self.session.commit()
         except Exception as err:
             raise RepoError(f"Error on save user") from err
         return User(id=r, name=user.name, password=user.password)
 
     def get(self, id: int) -> Optional[User]:
-        return None
+        r = self.session.query(UserModel).get(id)
+        if not r:
+            return None
+        return User(id=r.id, name=r.name, password=r.password)
 
     def find(self, name: str) -> Optional[User]:
-        return None
+        stmt = select(UserModel)
+        stmt = stmt.where(
+            UserModel.name == name
+        )
+        r = self.session.execute(stmt).scalar()
+        if not r:
+            return None
+        return User(id=r.id, name=r.name, password=r.password)
