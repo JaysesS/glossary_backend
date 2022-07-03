@@ -1,0 +1,5 @@
+class Fail:
+    """"""
+
+class Success:
+    """"""

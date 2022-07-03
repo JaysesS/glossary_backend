@@ -1,44 +1,41 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Optional, Union, List
 from glossary.src.core.entity.base import Word
 from glossary.src.core.dto.base import UpdateWordDTO
 from glossary.src.core.exception.base import RepoError
-from glossary.src.core.interfaces.repo.iword import IWordRepo
-from glossary.src.core.interfaces.repo.itag import ITagRepo
-from glossary.src.core.interfaces.repo.ipriority import IPriorityRepo
+from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
+from glossary.src.core.usecases.result_base import Fail, Success
 
 @dataclass
-class SuccessResult:
-    word: Word
+class SuccessResult(Success):
+    item: Word
 
 @dataclass
-class FailResult:
+class FailResult(Fail):
     msg: str
 
 class Usecase:
 
-    def __init__(self, word_repo: IWordRepo, tag_repo: ITagRepo, priority_repo: IPriorityRepo) -> None:
-        self.word_repo = word_repo
-        self.tag_repo = tag_repo
-        self.priority_repo = priority_repo
+    def __init__(self, repo: IGlossarySQLRepo) -> None:
+        self.repo = repo
 
-    def execute(self, word: UpdateWordDTO) -> Union[SuccessResult, FailResult]:
+    def execute(self,
+        user_id: int,
+        word_id: int,
+        description: Optional[str] = None,
+        tag_ids: Optional[List[int]] = None,
+        priority_id: Optional[int] = None
+    ) -> Union[SuccessResult, FailResult]:
         
-        try:
-            tags = self.tag_repo.list(ids=word.tag_ids)
-        except RepoError as e:
-            return FailResult(e.msg)
-        
-        if len(tags) != len(word.tag_ids):
-            return FailResult(msg=f"One of tag not found: {word.tag_ids}")
+        update_word = UpdateWordDTO(
+            id=word_id,
+            description=description,
+            tag_ids=tag_ids,
+            priority_id=priority_id
+        )
 
         try:
-            priority = self.priority_repo.get(id=word.priority_id)
+            updated_word = self.repo.update_word(update_word, user_id=user_id)
         except RepoError as e:
             return FailResult(e.msg)
-
-        try:
-            updated_word = self.word_repo.update(word)
-        except RepoError as e:
-            return FailResult(e.msg)
-        return SuccessResult(word=updated_word)
+        return SuccessResult(item=updated_word)

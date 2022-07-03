@@ -1,19 +1,30 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from glossary.application.database.holder import db
-from glossary.src.data.repo.priority.repo import PriorityRepo
+from typing import List
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from glossary.application.routes.schemas import PriorirySchema
+
+from glossary.src.core.entity.base import User
+from glossary.application.utils import get_glossary_repo, auth_user, reponse_from_result
+from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
 from glossary.src.core.usecases.priority import list
 
 router = APIRouter(
     prefix="/priority",
     tags=["Priority"],
-    # dependencies=[Depends(get_token_header)],
-    # responses={404: {"description": "Not found"}},
 )
 
-@router.get("/list")
-async def get_list():
-    repo = PriorityRepo(session = next(db.session))
+class PrioriryListResponseSchema(BaseModel):
+    items: List[PriorirySchema]
+
+@router.get("/list", response_model=PrioriryListResponseSchema)
+async def get_list(
+    repo: IGlossarySQLRepo = Depends(get_glossary_repo)
+):
     usecase = list.Usecase(repo=repo)
     result = usecase.execute()
-    return result
+    model, code = reponse_from_result(PrioriryListResponseSchema, result)
+    return JSONResponse(
+        content=model.dict(),
+        status_code=code
+    )

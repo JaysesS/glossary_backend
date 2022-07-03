@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from glossary.application.database.holder import db
+from glossary.application.utils import init_debug_validation_handler
 from glossary.src.core.exception.base import AuthError
 from glossary.application.settings import get_settings
 from glossary.application.routes.register import include_rotes
@@ -29,7 +30,15 @@ def create_app():
             status_code=status.HTTP_401_UNAUTHORIZED,
             content={"detail": str(exc)}
         )
+    
+    @app.exception_handler(Exception)
+    def exception_handler(request: Request, exc: Exception):
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": "Unhandled error!"}
+        )
 
     include_rotes(app, settings.GLOBAL_PREFIX_URL)
+    init_debug_validation_handler(app)
 
     return app

@@ -1,36 +1,38 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from glossary.application.database.holder import db
+
+from glossary.application.utils import auth_user, get_glossary_repo
 from glossary.src.core.services.jwt_auth import auth_service
+
+from glossary.src.core.entity.base import User
 from glossary.src.core.dto.base import CreateUserDTO
 from glossary.src.core.exception.base import AuthError, RepoError
-from glossary.src.data.repo.user.repo import UserRepo
+from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
 
 router = APIRouter(
     prefix="/user",
     tags=["User"]
 )
 
-auth_scheme = HTTPBearer()
-
 class UserSchema(BaseModel):
-    name: str = Field(description="Username", max_length=30, min_length=5)
-    password: str = Field(description="Password", max_length=30, min_length=5)
+    name: str = Field(max_length=30, min_length=5)
+    password: str = Field(max_length=30, min_length=5)
 
 class UserSchemaResponce(UserSchema):
-    id: int = Field(description="User id")
+    id: int
 
 class LoginResponce(BaseModel):
     token: str
 
 @router.post("/register", response_model=UserSchemaResponce)
-def register(user_data: UserSchema = Body()):
-    repo = UserRepo(session = next(db.session))
+def register(
+    user_data: UserSchema = Body(),
+    repo: IGlossarySQLRepo = Depends(get_glossary_repo)
+):
     try:
-        user = repo.save(
+        user = repo.save_user(
             CreateUserDTO(name=user_data.name, password=user_data.password)
         )
     except RepoError as err:
@@ -38,8 +40,10 @@ def register(user_data: UserSchema = Body()):
     return JSONResponse(content=jsonable_encoder(user))
 
 @router.post("/login", response_model=LoginResponce)
-def login(user_data: UserSchema = Body()):
-    repo = UserRepo(session = next(db.session))
+def login(
+    user_data: UserSchema = Body(),
+    repo: IGlossarySQLRepo = Depends(get_glossary_repo)
+):
     try:
         token = auth_service.login(
             name=user_data.name,
@@ -51,18 +55,5 @@ def login(user_data: UserSchema = Body()):
     return JSONResponse(content=jsonable_encoder(LoginResponce(token=token)))
 
 @router.get("/me", response_model=UserSchemaResponce)
-def me(authorization: HTTPAuthorizationCredentials = Depends(auth_scheme)):
-    try:
-        user_id = auth_service.get_user_id(token=authorization.credentials)
-    except AuthError as err:
-        raise HTTPException(status_code=401, detail=str(err))
-    
-    repo = UserRepo(session = next(db.session))
-    try:
-        user = repo.get(id=user_id)
-    except RepoError as err:
-        raise HTTPException(status_code=500, detail=str(err))
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found, probably deleted")
+def me(user: User = Depends(auth_user)):
     return JSONResponse(content=jsonable_encoder(user))

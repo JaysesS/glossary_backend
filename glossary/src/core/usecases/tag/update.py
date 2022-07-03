@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Union
 from glossary.src.core.entity.base import Tag
-from glossary.src.core.dto.base import CreateTagDTO
+from glossary.src.core.dto.base import UpdateTagDTO
 from glossary.src.core.exception.base import RepoError
 from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
 
@@ -18,18 +18,21 @@ class Usecase:
     def __init__(self, repo: IGlossarySQLRepo) -> None:
         self.repo = repo
 
-    def execute(self, 
+    def execute(self,
         user_id: int,
-        name: str,
-        description: str
+        tag_id: int,
+        name: Optional[str] = None,
+        description: Optional[str] = None
     ) -> Union[SuccessResult, FailResult]:
 
-        tag = CreateTagDTO(
+        tag_update = UpdateTagDTO(
+            id=tag_id,
             name=name,
-            description=description,
+            description=description
         )
+
         try:
-            created_tag = self.repo.save_tag(tag=tag, user_id=user_id)
+            update_tag = self.repo.update_tag(tag_update, user_id=user_id)
         except RepoError as e:
             return FailResult(e.msg)
-        return SuccessResult(tag=created_tag)
+        return SuccessResult(tag=update_tag)

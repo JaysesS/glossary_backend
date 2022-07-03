@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from glossary.src.core.entity.base import User
 from glossary.src.core.exception.base import AuthError
 from glossary.application.settings import get_settings
-from glossary.src.core.interfaces.repo.iuser import IUserRepo
+from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
 from glossary.src.core.interfaces.services.iauth import IAuthService
 
 class AuthJWTService(IAuthService):
@@ -30,8 +30,8 @@ class AuthJWTService(IAuthService):
         user_id = payload["user_id"]
         return user_id
 
-    def login(self, name: str, password: str, repo: IUserRepo) -> str:
-        user = repo.find(name=name)
+    def login(self, name: str, password: str, repo: IGlossarySQLRepo) -> str:
+        user = repo.find_user(name=name)
         if not user:
             raise AuthError("Credential error")
         if user.password != password:
@@ -42,9 +42,9 @@ class AuthJWTService(IAuthService):
     def get_user_id(self, token: str) -> int:
         return self._verify_token(token=token)
     
-    def check(self, token: str, repo: IUserRepo) -> User:
+    def check(self, token: str, repo: IGlossarySQLRepo) -> User:
         user_id = self._verify_token(token=token)
-        user = repo.get(user_id)
+        user = repo.get_user(user_id)
         if not user:
             raise AuthError("Payload fail")
         return user

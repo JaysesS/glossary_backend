@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 from glossary.src.core.entity.base import Priority, Tag
 
 @dataclass
@@ -10,23 +10,28 @@ class CreateTagDTO:
 @dataclass
 class UpdateTagDTO:
     id: int
-    description: str
+    name: Optional[str] = None
+    description: Optional[str] = None
 
 @dataclass
 class CreateWordDTO:
     name: str
     description: str
-    tags: List[Tag]
-    priority: Priority
+    tag_ids: List[int]
+    priority_id: int
 
 @dataclass
 class UpdateWordDTO:
     id: int
-    description: str
-    tag_ids: List[int]
-    priority_id: int
+    description: Optional[str] = None
+    tag_ids: Optional[List[int]] = None
+    priority_id: Optional[int] = None
 
 @dataclass
 class CreateUserDTO:
     name: str
     password: str
+
+@dataclass
+class CreatePriorityDTO:
+    name: str

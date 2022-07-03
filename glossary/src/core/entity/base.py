@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
+
 @dataclass
 class Priority:
     id: int
@@ -11,6 +12,7 @@ class Tag:
     id: int
     name: str
     description: str
+    created_at: int
 
 @dataclass
 class Word:
@@ -19,9 +21,11 @@ class Word:
     description: str
     tags: List[Tag]
     priority: Priority
+    created_at: int
 
 @dataclass
 class User:
     id: int
     name: str
     password: str
+    created_at: int

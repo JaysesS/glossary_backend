@@ -1,8 +1,8 @@
 """Init tables
 
-Revision ID: 96ccfff79f45
+Revision ID: 4baa99d0f6ae
 Revises: 
-Create Date: 2022-07-02 00:43:58.207538
+Create Date: 2022-07-03 17:30:56.735498
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '96ccfff79f45'
+revision = '4baa99d0f6ae'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,18 +21,9 @@ def upgrade() -> None:
     op.create_table('priority',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_priority_id'), 'priority', ['id'], unique=False)
-    op.create_table('tag',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(), nullable=True),
-    sa.Column('description', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
-    )
-    op.create_index(op.f('ix_tag_id'), 'tag', ['id'], unique=False)
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
@@ -41,6 +32,15 @@ def upgrade() -> None:
     sa.UniqueConstraint('name')
     )
     op.create_index(op.f('ix_user_id'), 'user', ['id'], unique=False)
+    op.create_table('tag',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=True),
+    sa.Column('description', sa.String(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_tag_id'), 'tag', ['id'], unique=False)
     op.create_table('word',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
@@ -48,17 +48,16 @@ def upgrade() -> None:
     sa.Column('priority_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['priority_id'], ['priority.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_word_id'), 'word', ['id'], unique=False)
     op.create_table('word_tags',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('word_id', sa.Integer(), nullable=True),
     sa.Column('tag_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['tag_id'], ['tag.id'], ),
-    sa.ForeignKeyConstraint(['word_id'], ['word.id'], ),
+    sa.ForeignKeyConstraint(['tag_id'], ['tag.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['word_id'], ['word.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
@@ -69,10 +68,10 @@ def downgrade() -> None:
     op.drop_table('word_tags')
     op.drop_index(op.f('ix_word_id'), table_name='word')
     op.drop_table('word')
-    op.drop_index(op.f('ix_user_id'), table_name='user')
-    op.drop_table('user')
     op.drop_index(op.f('ix_tag_id'), table_name='tag')
     op.drop_table('tag')
+    op.drop_index(op.f('ix_user_id'), table_name='user')
+    op.drop_table('user')
     op.drop_index(op.f('ix_priority_id'), table_name='priority')
     op.drop_table('priority')
     # ### end Alembic commands ###
