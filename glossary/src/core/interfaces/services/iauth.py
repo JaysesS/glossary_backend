@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from glossary.src.core.entity.base import User
-from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
+from glossary.src.core.interfaces.repo.iuser_sql_repo import IUserSQLRepo
 
 
 class IAuthService(ABC):
@@ -17,7 +17,7 @@ class IAuthService(ABC):
         pass
 
     @abstractmethod
-    def login(self, name: str, password: str, repo: IGlossarySQLRepo) -> str:
+    def login(self, name: str, password: str, repo: IUserSQLRepo) -> str:
         pass
 
     @abstractmethod
@@ -25,5 +25,5 @@ class IAuthService(ABC):
         pass
     
     @abstractmethod
-    def check(self, token: str, repo: IGlossarySQLRepo) -> User:
+    def check(self, token: str, repo: IUserSQLRepo) -> User:
         pass

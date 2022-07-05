@@ -23,9 +23,10 @@ class CreateWordDTO:
 @dataclass
 class UpdateWordDTO:
     id: int
+    priority_id: int
+    name: Optional[str] = None
     description: Optional[str] = None
     tag_ids: Optional[List[int]] = None
-    priority_id: Optional[int] = None
 
 @dataclass
 class CreateUserDTO:

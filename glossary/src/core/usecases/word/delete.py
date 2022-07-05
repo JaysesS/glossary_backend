@@ -22,4 +22,6 @@ class Usecase:
             remove_id = self.repo.rm_word(user_id=user_id, id=word_id)
         except RepoError as e:
             return FailResult(e.msg)
+        if remove_id is None:
+            return FailResult("Word not found")
         return SuccessResult(remove_id=remove_id)

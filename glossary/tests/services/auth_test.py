@@ -3,7 +3,7 @@ from glossary.src.core.dto.base import CreateUserDTO
 from glossary.application.database.holder import db
 from glossary.application.database.holder import Base
 from glossary.src.core.services.jwt_auth import AuthJWTService
-from glossary.src.data.repo.sql_repo.repo import GlossarySQLRepo
+from glossary.src.data.user_repo.sql_repo.repo import UserSQLRepo
 
 db.url = "postgresql://jayse:test@localhost:5432/glossary_app_db"
 db.make_engine()
@@ -17,15 +17,15 @@ class AuthServiceTest(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         Base.metadata.create_all(bind=db._engine)
-        Base.metadata.drop_all(bind=db._engine)
-        Base.metadata.create_all(bind=db._engine)
+        # Base.metadata.drop_all(bind=db._engine)
+        # Base.metadata.create_all(bind=db._engine)
         cls.session = next(db.session)
-        cls.repo = GlossarySQLRepo(cls.session)
+        cls.repo = UserSQLRepo(cls.session)
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls.session.rollback()
-        Base.metadata.drop_all(bind=db._engine)
+    # @classmethod
+    # def tearDownClass(cls) -> None:
+    #     cls.session.rollback()
+    #     Base.metadata.drop_all(bind=db._engine)
 
     def test_login(self):
         auth_service = AuthJWTService(secret=SECRET, lifetime=50)

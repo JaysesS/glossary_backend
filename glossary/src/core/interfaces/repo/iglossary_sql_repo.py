@@ -26,7 +26,7 @@ class IGlossarySQLRepo(ABC):
         pass
 
     @abstractmethod
-    def rm_tag(self, id: int, user_id: int) -> int:
+    def rm_tag(self, id: int, user_id: int) -> Optional[int]:
         pass
 
     @abstractmethod
@@ -43,15 +43,7 @@ class IGlossarySQLRepo(ABC):
         pass
 
     @abstractmethod
-    def save_user(self, user: CreateUserDTO) -> User:
-        pass
-
-    @abstractmethod
-    def get_user(self, id: int) -> Optional[User]:
-        pass
-    
-    @abstractmethod
-    def find_user(self, name: str) -> Optional[User]:
+    def get_word(self, id: int, user_id: int) -> Optional[Word]:
         pass
 
     @abstractmethod
@@ -63,13 +55,14 @@ class IGlossarySQLRepo(ABC):
         pass
     
     @abstractmethod
-    def rm_word(self, id: int, user_id: int) -> int:
+    def rm_word(self, id: int, user_id: int) -> Optional[int]:
         pass
 
     @abstractmethod
     def list_word(self, 
         user_id: int,
         tag_ids: Optional[List[int]] = None,
+        priority_id: Optional[int] = None,
         offset: int = 0,
         limit: Optional[int] = None
     ) -> List[Word]:

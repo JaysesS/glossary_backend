@@ -20,14 +20,20 @@ class Usecase:
 
     def execute(self,
         user_id: int,
-        priority_id: Optional[int] = None, # TODO
+        priority_id: Optional[int] = None,
         tag_ids: Optional[List[int]] = None,
         limit: Optional[int] = None,
         offset: int = 0
     ) -> Union[SuccessResult, FailResult]:
 
         try:
-            word_list = self.repo.list_word(user_id=user_id, tag_ids=tag_ids, limit=limit, offset=offset)
+            word_list = self.repo.list_word(
+                user_id=user_id,
+                tag_ids=tag_ids,
+                priority_id=priority_id,
+                limit=limit,
+                offset=offset
+            )
         except RepoError as e:
             return FailResult(e.msg)
         

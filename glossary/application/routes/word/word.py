@@ -1,11 +1,11 @@
 from typing import List, Optional
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from glossary.application.routes.schemas import WordSchema
 from glossary.src.core.entity.base import User
 from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
-from glossary.src.core.usecases.word import save, list, delete
+from glossary.src.core.usecases.word import save, list as uc_list, delete
 from glossary.application.utils import auth_user, get_glossary_repo, reponse_from_result
 
 
@@ -29,12 +29,6 @@ class WordCreateSchema(BaseModel):
     priority_id: int
     tag_ids: List[int]
 
-class WordListSchema(BaseModel):
-    offset: int = 0
-    limit: Optional[int] = None
-    priority_id: Optional[int] = None
-    tag_ids: Optional[List[int]] = None
-
 
 @router.post("/", response_model=WordResponseSchema)
 def save_word(
@@ -54,15 +48,28 @@ def save_word(
         status_code=code
     )
 
-@router.post("/list", response_model=WordListResponseSchema)
+@router.get("/list", response_model=WordListResponseSchema)
 def list_word(
-    filter_data: WordListSchema = Body(),
+    offset: int = 0,
+    limit: Optional[int] = None,
+    priority_id: Optional[int] = None,
+    tag_ids: Optional[str] = None,
     repo: IGlossarySQLRepo = Depends(get_glossary_repo),
     user: User = Depends(auth_user)
 ):
-    usecase = list.Usecase(repo)
+    if tag_ids is not None:
+        try:
+            tag_ids_list = list(map(int, tag_ids.split(","))) # type: ignore
+        except Exception:
+            return JSONResponse(content=dict(msg="Tag_ids must be like '1,2,3'"))
+    else:
+        tag_ids_list = None
+    usecase = uc_list.Usecase(repo)
     result = usecase.execute(
-        **filter_data.dict(),
+        offset=offset,
+        limit=limit,
+        priority_id=priority_id,
+        tag_ids=tag_ids_list,
         user_id=user.id
     )
 
@@ -72,12 +79,13 @@ def list_word(
         status_code=code
     )
 
-@router.post("/{id:int}/delete", response_model=WordRemoveResponseSchema)
+@router.delete("/{id:int}", response_model=WordRemoveResponseSchema)
 def rm_word(
     id: int,
     repo: IGlossarySQLRepo = Depends(get_glossary_repo),
     user: User = Depends(auth_user)
 ):
+
     usecase = delete.Usecase(repo)
     result = usecase.execute(
         word_id=id,

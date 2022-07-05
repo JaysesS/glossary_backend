@@ -3,13 +3,14 @@ from typing import Optional, Union, List
 from glossary.src.core.entity.base import Tag
 from glossary.src.core.exception.base import RepoError
 from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
+from glossary.src.core.usecases.result_base import Fail, Success
 
 @dataclass
-class SuccessResult:
+class SuccessResult(Success):
     items: List[Tag]
 
 @dataclass
-class FailResult:
+class FailResult(Fail):
     msg: str
 
 class Usecase:

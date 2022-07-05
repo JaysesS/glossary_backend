@@ -1,6 +1,9 @@
 from typing import List
 from pydantic import BaseModel, Field
 
+class FailSchema(BaseModel):
+    msg: str
+
 class PriorirySchema(BaseModel):
     id: int
     name: str

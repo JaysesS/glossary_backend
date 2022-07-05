@@ -22,13 +22,15 @@ class Usecase:
     def execute(self,
         user_id: int,
         word_id: int,
+        priority_id: int,
+        name: Optional[str] = None,
         description: Optional[str] = None,
         tag_ids: Optional[List[int]] = None,
-        priority_id: Optional[int] = None
     ) -> Union[SuccessResult, FailResult]:
         
         update_word = UpdateWordDTO(
             id=word_id,
+            name=name,
             description=description,
             tag_ids=tag_ids,
             priority_id=priority_id

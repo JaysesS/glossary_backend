@@ -3,13 +3,13 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from glossary.application.utils import auth_user, get_glossary_repo
+from glossary.application.utils import auth_user, get_user_repo
 from glossary.src.core.services.jwt_auth import auth_service
 
 from glossary.src.core.entity.base import User
 from glossary.src.core.dto.base import CreateUserDTO
 from glossary.src.core.exception.base import AuthError, RepoError
-from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
+from glossary.src.core.interfaces.repo.iuser_sql_repo import IUserSQLRepo
 
 router = APIRouter(
     prefix="/user",
@@ -29,7 +29,7 @@ class LoginResponce(BaseModel):
 @router.post("/register", response_model=UserSchemaResponce)
 def register(
     user_data: UserSchema = Body(),
-    repo: IGlossarySQLRepo = Depends(get_glossary_repo)
+    repo: IUserSQLRepo = Depends(get_user_repo)
 ):
     try:
         user = repo.save_user(
@@ -42,7 +42,7 @@ def register(
 @router.post("/login", response_model=LoginResponce)
 def login(
     user_data: UserSchema = Body(),
-    repo: IGlossarySQLRepo = Depends(get_glossary_repo)
+    repo: IUserSQLRepo = Depends(get_user_repo)
 ):
     try:
         token = auth_service.login(
