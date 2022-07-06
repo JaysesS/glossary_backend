@@ -16,3 +16,5 @@ RUN set -eux \
     && rm -rf /root/.cache/pip
 
 COPY . /app/
+
+ENTRYPOINT ["uvicorn", "glossary.application.app:create_app", "--factory", "--port", "8080", "--reload"]
