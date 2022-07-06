@@ -17,4 +17,4 @@ RUN set -eux \
 
 COPY . /app/
 
-ENTRYPOINT ["uvicorn", "glossary.application.app:create_app", "--factory", "--port", "8080", "--reload"]
+CMD ["uvicorn", "--factory", "glossary.application.app:create_app", "--host", "0.0.0.0", "--port", "8080"]

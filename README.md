@@ -15,7 +15,8 @@ In container port: **8080**
 
 ```bash
 docker build -t glossary_backend .
-docker run -d --name glossary_backend_container  --network host glossary_backend
+
+docker run -d --name glossary_backend_container --network host glossary_backend
 ```
 
 In progress..
