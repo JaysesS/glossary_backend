@@ -2,7 +2,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Body, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from glossary.application.routes.schemas import TagSchema
+from glossary.application.routes.schemas import FailSchema, TagSchema
 from glossary.src.core.entity.base import User
 from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
 from glossary.src.core.usecases.tag import save, list as uc_list, delete
@@ -27,7 +27,7 @@ class TagCreateSchema(BaseModel):
     name: str = Field(min_length=1)
     description: str = Field(min_length=0)
 
-@router.post("/", response_model=TagResponseSchema)
+@router.post("/", response_model=TagResponseSchema, responses={400: {"model": FailSchema}})
 def save_tag(
     tag_data: TagCreateSchema = Body(),
     repo: IGlossarySQLRepo = Depends(get_glossary_repo),
@@ -44,7 +44,7 @@ def save_tag(
         status_code=code
     )
 
-@router.get("/list", response_model=TagListResponseSchema)
+@router.get("/list", response_model=TagListResponseSchema, responses={400: {"model": FailSchema}})
 def list_tag(
     offset: int = 0,
     limit: Optional[int] = None,
@@ -64,7 +64,7 @@ def list_tag(
         status_code=code
     )
 
-@router.delete("/{id:int}", response_model=TagRemoveResponseSchema)
+@router.delete("/{id:int}", response_model=TagRemoveResponseSchema, responses={400: {"model": FailSchema}})
 def rm_tag(
     id: int,
     repo: IGlossarySQLRepo = Depends(get_glossary_repo),

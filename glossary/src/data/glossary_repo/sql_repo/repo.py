@@ -62,6 +62,8 @@ class GlossarySQLRepo(IGlossarySQLRepo):
     def update_tag(self, tag: UpdateTagDTO, user_id: int) -> Tag:
         tag_dict = asdict(tag)
         tag_model = self.session.query(TagModel).get(tag_dict.pop("id"))
+        if user_id != tag_model.user_id:
+            raise RepoError("You can't change this tag")
         for k,v in tag_dict.items():
             if v is not None:
                 if hasattr(tag_model, k):
@@ -155,7 +157,12 @@ class GlossarySQLRepo(IGlossarySQLRepo):
         )
 
     def save_word(self, word: CreateWordDTO, user_id: int) -> Word:
-        tags_stmt = select(TagModel).where(TagModel.id.in_(word.tag_ids))
+        tags_stmt = select(TagModel).where(
+            and_(
+                TagModel.id.in_(word.tag_ids),
+                TagModel.user_id == user_id
+            )
+        )
         try:
             tag_models = self.session.execute(tags_stmt).scalars().all()
         except Exception as err:
@@ -216,6 +223,8 @@ class GlossarySQLRepo(IGlossarySQLRepo):
     def update_word(self, word: UpdateWordDTO, user_id: int) -> Word:
         word_dict = asdict(word)
         word_model = self.session.query(WordModel).get(word_dict.pop("id"))
+        if user_id != word_model.user_id:
+            raise RepoError("You can't change this word")
 
         tag_ids = word_dict.pop("tag_ids")
         if isinstance(tag_ids, list):

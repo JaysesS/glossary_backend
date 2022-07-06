@@ -2,10 +2,10 @@ from typing import List, Optional
 from fastapi import APIRouter, Body, Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from glossary.application.routes.schemas import WordSchema
+from glossary.application.routes.schemas import FailSchema, WordSchema
 from glossary.src.core.entity.base import User
 from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
-from glossary.src.core.usecases.word import save, list as uc_list, delete
+from glossary.src.core.usecases.word import save, list as uc_list, delete, update
 from glossary.application.utils import auth_user, get_glossary_repo, reponse_from_result
 
 
@@ -30,7 +30,11 @@ class WordCreateSchema(BaseModel):
     tag_ids: List[int]
 
 
-@router.post("/", response_model=WordResponseSchema)
+@router.post(
+    "/",
+    response_model=WordResponseSchema,
+    responses={400: {"model": FailSchema}}
+)
 def save_word(
     word_data: WordCreateSchema = Body(),
     repo: IGlossarySQLRepo = Depends(get_glossary_repo),
@@ -48,7 +52,11 @@ def save_word(
         status_code=code
     )
 
-@router.get("/list", response_model=WordListResponseSchema)
+@router.get(
+    "/list",
+    response_model=WordListResponseSchema,
+    responses={400: {"model": FailSchema}}
+)
 def list_word(
     offset: int = 0,
     limit: Optional[int] = None,
@@ -79,7 +87,11 @@ def list_word(
         status_code=code
     )
 
-@router.delete("/{id:int}", response_model=WordRemoveResponseSchema)
+@router.delete(
+    "/{id:int}", 
+    response_model=WordRemoveResponseSchema,
+    responses={400: {"model": FailSchema}}
+)
 def rm_word(
     id: int,
     repo: IGlossarySQLRepo = Depends(get_glossary_repo),
@@ -96,3 +108,27 @@ def rm_word(
         content=model.dict(),
         status_code=code
     )
+
+@router.patch(
+    "/{id:int}", 
+    response_model=WordResponseSchema,
+    responses={400: {"model": FailSchema}}
+)
+def update_word(
+    id: int,
+    word_data: WordCreateSchema = Body(),
+    repo: IGlossarySQLRepo = Depends(get_glossary_repo),
+    user: User = Depends(auth_user)
+):
+    usecase = update.Usecase(repo)
+    result = usecase.execute(
+        **word_data.dict(),
+        word_id=id,
+        user_id=user.id
+    )
+    model, code = reponse_from_result(WordResponseSchema, result)
+    return JSONResponse(
+        content=model.dict(),
+        status_code=code
+    )
+

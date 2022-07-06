@@ -2,10 +2,9 @@ from typing import List
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from glossary.application.routes.schemas import PriorirySchema
+from glossary.application.routes.schemas import FailSchema, PriorirySchema
 
-from glossary.src.core.entity.base import User
-from glossary.application.utils import get_glossary_repo, auth_user, reponse_from_result
+from glossary.application.utils import get_glossary_repo, reponse_from_result
 from glossary.src.core.interfaces.repo.iglossary_sql_repo import IGlossarySQLRepo
 from glossary.src.core.usecases.priority import list
 
@@ -17,7 +16,7 @@ router = APIRouter(
 class PrioriryListResponseSchema(BaseModel):
     items: List[PriorirySchema]
 
-@router.get("/list", response_model=PrioriryListResponseSchema)
+@router.get("/list", response_model=PrioriryListResponseSchema, responses={400: {"model": FailSchema}})
 async def get_list(
     repo: IGlossarySQLRepo = Depends(get_glossary_repo)
 ):

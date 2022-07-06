@@ -22,11 +22,15 @@ class UserSchema(BaseModel):
 
 class UserSchemaResponce(UserSchema):
     id: int
+    created_at: int
 
 class LoginResponce(BaseModel):
     token: str
 
-@router.post("/register", response_model=UserSchemaResponce)
+@router.post(
+    "/register",
+    response_model=UserSchemaResponce
+)
 def register(
     user_data: UserSchema = Body(),
     repo: IUserSQLRepo = Depends(get_user_repo)
@@ -39,7 +43,10 @@ def register(
         raise HTTPException(status_code=400, detail=str(err))
     return JSONResponse(content=jsonable_encoder(user))
 
-@router.post("/login", response_model=LoginResponce)
+@router.post(
+    "/login",
+    response_model=LoginResponce
+)
 def login(
     user_data: UserSchema = Body(),
     repo: IUserSQLRepo = Depends(get_user_repo)
@@ -54,6 +61,9 @@ def login(
         raise HTTPException(status_code=401, detail=str(err))
     return JSONResponse(content=jsonable_encoder(LoginResponce(token=token)))
 
-@router.get("/me", response_model=UserSchemaResponce)
+@router.get(
+    "/me",
+    response_model=UserSchemaResponce
+)
 def me(user: User = Depends(auth_user)):
     return JSONResponse(content=jsonable_encoder(user))
