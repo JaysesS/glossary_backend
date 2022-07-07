@@ -1,19 +1,16 @@
-FROM python:3.9.4-alpine
+FROM python:3.9 as requirements-stage
+
+WORKDIR /tmp
+
+COPY ./requirements.txt /tmp/requirements.txt
+
+FROM python:3.9
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
-COPY ./requirements.txt /app/requirements.txt
-
-RUN set -eux \
-    && apk add --no-cache --virtual .build-deps build-base \
-        libressl-dev libffi-dev gcc musl-dev python3-dev \
-        postgresql-dev bash \
-    && pip install --upgrade pip setuptools wheel \
-    && pip install -r /app/requirements.txt \
-    && rm -rf /root/.cache/pip
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY . /app/
 
