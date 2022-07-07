@@ -1,3 +1,4 @@
+from fastapi.logger import logger
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from glossary.application.database.holder import db
