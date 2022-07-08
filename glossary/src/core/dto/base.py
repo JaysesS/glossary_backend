@@ -30,7 +30,7 @@ class UpdateWordDTO:
 
 @dataclass
 class CreateUserDTO:
-    name: str
+    login: str
     password: str
 
 @dataclass

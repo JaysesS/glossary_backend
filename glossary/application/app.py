@@ -1,4 +1,5 @@
 from fastapi.logger import logger
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from glossary.application.database.holder import db
@@ -15,6 +16,13 @@ def create_app():
         docs_url=f"{settings.GLOBAL_PREFIX_URL}/docs",
         redoc_url=f"{settings.GLOBAL_PREFIX_URL}/redoc",
         debug=True
+    )
+    app.add_middleware(
+    CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     db.url = settings.DATABASE_URL

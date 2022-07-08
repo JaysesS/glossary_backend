@@ -14,5 +14,5 @@ class IUserSQLRepo(ABC):
         pass
     
     @abstractmethod
-    def find_user(self, name: str) -> Optional[User]:
+    def find_user(self, login: str) -> Optional[User]:
         pass

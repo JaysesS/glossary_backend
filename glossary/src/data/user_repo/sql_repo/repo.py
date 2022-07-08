@@ -15,7 +15,7 @@ class UserSQLRepo(IUserSQLRepo):
 
     def save_user(self, user: CreateUserDTO) -> User:
         user_model = UserModel(
-            name=user.name, password=user.password
+            login=user.login, password=user.password
         )
         self.session.add(user_model)
         try:
@@ -24,7 +24,7 @@ class UserSQLRepo(IUserSQLRepo):
             raise RepoError("Error on save user") from err
         return User(
             id=user_model.id, # type: ignore
-            name=user.name,
+            login=user.login,
             password=user.password,
             created_at=int(user_model.created_at.timestamp())
         )
@@ -36,14 +36,14 @@ class UserSQLRepo(IUserSQLRepo):
             raise RepoError("Error on get user")
         if not r:
             return None
-        return User(id=r.id, name=r.name, password=r.password, created_at=int(r.created_at.timestamp()))
+        return User(id=r.id, login=r.name, password=r.password, created_at=int(r.created_at.timestamp()))
 
-    def find_user(self, name: str) -> Optional[User]:
+    def find_user(self, login: str) -> Optional[User]:
         stmt = select(UserModel)
         stmt = stmt.where(
-            UserModel.name == name
+            UserModel.login == login
         )
         r = self.session.execute(stmt).scalar()
         if not r:
             return None
-        return User(id=r.id, name=r.name, password=r.password, created_at=int(r.created_at.timestamp()))
+        return User(id=r.id, login=r.login, password=r.password, created_at=int(r.created_at.timestamp()))

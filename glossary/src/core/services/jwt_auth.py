@@ -30,8 +30,8 @@ class AuthJWTService(IAuthService):
         user_id = payload["user_id"]
         return user_id
 
-    def login(self, name: str, password: str, repo: IUserSQLRepo) -> str:
-        user = repo.find_user(name=name)
+    def login(self, login: str, password: str, repo: IUserSQLRepo) -> str:
+        user = repo.find_user(login=login)
         if not user:
             raise AuthError("Credential error")
         if user.password != password:

@@ -26,6 +26,6 @@ class Word:
 @dataclass
 class User:
     id: int
-    name: str
+    login: str
     password: str
     created_at: int

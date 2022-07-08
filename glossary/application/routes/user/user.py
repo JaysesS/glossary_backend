@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 class UserSchema(BaseModel):
-    name: str = Field(max_length=30, min_length=5)
+    login: str = Field(max_length=30, min_length=5)
     password: str = Field(max_length=30, min_length=5)
 
 class UserSchemaResponce(UserSchema):
@@ -37,7 +37,7 @@ def register(
 ):
     try:
         user = repo.save_user(
-            CreateUserDTO(name=user_data.name, password=user_data.password)
+            CreateUserDTO(login=user_data.login, password=user_data.password)
         )
     except RepoError as err:
         raise HTTPException(status_code=400, detail=str(err))
@@ -53,7 +53,7 @@ def login(
 ):
     try:
         token = auth_service.login(
-            name=user_data.name,
+            login=user_data.login,
             password=user_data.password,
             repo=repo
         )

@@ -17,7 +17,7 @@ class IAuthService(ABC):
         pass
 
     @abstractmethod
-    def login(self, name: str, password: str, repo: IUserSQLRepo) -> str:
+    def login(self, login: str, password: str, repo: IUserSQLRepo) -> str:
         pass
 
     @abstractmethod
