@@ -36,7 +36,7 @@ class UserSQLRepo(IUserSQLRepo):
             raise RepoError("Error on get user")
         if not r:
             return None
-        return User(id=r.id, login=r.name, password=r.password, created_at=int(r.created_at.timestamp()))
+        return User(id=r.id, login=r.login, password=r.password, created_at=int(r.created_at.timestamp()))
 
     def find_user(self, login: str) -> Optional[User]:
         stmt = select(UserModel)
