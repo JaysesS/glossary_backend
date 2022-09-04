@@ -4,7 +4,10 @@ class DomainError(Exception):
         self.msg = msg
         super().__init__(self.msg)
 
-class RepoError(DomainError):
+class CrudError(DomainError):
+    """ """
+
+class CrudNotFoundError(CrudError):
     """ """
 
 class AuthError(DomainError):

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     DB_USER: str = os.getenv("DB_USER", "jayse")
     DB_PASSWORD: str = os.getenv("DB_PASSWORD", "test")
     DB_NAME: str = os.getenv("DB_NAME", "glossary_app_db")
-    DATABASE_URL: str = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    DATABASE_URL: str = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     TOKEN_LIFE_TIME: int = 60 * 60
 

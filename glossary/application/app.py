@@ -25,13 +25,7 @@ def create_app():
         allow_headers=["*"],
     )
 
-    db.url = settings.DATABASE_URL
-    db.make_engine()
-
-    session = next(db.session)
-    check, = session.execute('select 1').first()
-    if check != 1:
-        raise Exception("Problem with db on create_app")
+    db.configure(settings.DATABASE_URL)
 
     @app.exception_handler(AuthError)
     def auth_exception_handler(request: Request, exc: AuthError):
