@@ -1,12 +1,13 @@
-from fastapi.logger import logger
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
-from glossary.application.database.holder import db
-from glossary.application.utils import init_debug_validation_handler
-from glossary.src.core.exception.base import AuthError
+
 from glossary.application.settings import get_settings
+from glossary.application.database.holder import db
 from glossary.application.routes.register import include_rotes
+from glossary.application.utils.error_handlers import register_error_handlers
+
+from glossary.src.core.exception.base import AuthError
+from glossary.src.core.services.jwt_auth import auth_service
 
 
 def create_app():
@@ -27,21 +28,12 @@ def create_app():
 
     db.configure(settings.DATABASE_URL)
 
-    @app.exception_handler(AuthError)
-    def auth_exception_handler(request: Request, exc: AuthError):
-        return JSONResponse(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": str(exc)}
-        )
-    
-    @app.exception_handler(Exception)
-    def exception_handler(request: Request, exc: Exception):
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"detail": "Unhandled error!"}
-        )
+    auth_service.configure(
+        secret=settings.SECRET_KEY,
+        lifetime=settings.TOKEN_LIFE_TIME
+    )
 
     include_rotes(app, settings.GLOBAL_PREFIX_URL)
-    init_debug_validation_handler(app)
+    register_error_handlers(app)
 
     return app

@@ -1,4 +1,9 @@
+from typing import Optional
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from glossary.src.data.crud.base import CRUDASyncBase
+from glossary.src.core.exception.base import CrudNotFoundError
 from glossary.src.data.models import UserModel, TagModel, WordModel, WordTagModel
 from glossary.src.core.schemas.entity import (
     UserSchema, UserCreateSchema, UserUpdateSchema,
@@ -6,17 +11,26 @@ from glossary.src.core.schemas.entity import (
     WordSchema, WordCreateSchema, WordUpdateSchema
 )
 
-class UserCRUD(CRUDASyncBase[UserModel, UserCreateSchema, UserUpdateSchema]):
+class UserCRUD(CRUDASyncBase[UserModel, UserSchema, UserCreateSchema, UserUpdateSchema]):
+    
+    async def get_by_login(self, session: AsyncSession, *, login: str) -> Optional[UserSchema]:
+        stmt = select(self.model).where(
+            self.model.login == login
+        )
+        coro = await session.execute(stmt)
+        db_obj = coro.scalar()
+        if db_obj is None:
+            raise CrudNotFoundError(f"Not found user with login={login}")
+        return UserSchema(**db_obj.__dict__)
+
+user_crud = UserCRUD(UserModel, UserSchema)
+
+class TagCRUD(CRUDASyncBase[TagModel, TagSchema, TagCreateSchema, TagUpdateSchema]):
     """ Declare model specific CRUD operation methods. """
 
-user_crud = UserCRUD(UserModel)
+tag_crud = TagCRUD(TagModel, TagSchema)
 
-class TagCRUD(CRUDASyncBase[TagModel, TagCreateSchema, TagUpdateSchema]):
+class WordCRUD(CRUDASyncBase[WordModel, WordSchema, WordCreateSchema, WordUpdateSchema]):
     """ Declare model specific CRUD operation methods. """
 
-tag_crud = TagCRUD(TagModel)
-
-class WordCRUD(CRUDASyncBase[WordModel, WordCreateSchema, WordUpdateSchema]):
-    """ Declare model specific CRUD operation methods. """
-
-word_crud = WordCRUD(WordModel)
+word_crud = WordCRUD(WordModel, WordSchema)
