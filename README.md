@@ -9,6 +9,7 @@
 ### Run tests
 
     pytest glossary/tests/test_session.py
+    python -m unittest glossary.tests.services.auth_test.AuthServiceTest -v
 
 ### Migration
 

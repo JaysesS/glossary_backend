@@ -1,6 +1,7 @@
 from unittest import TestCase
+from glossary.tests.deps import settings
+
 from glossary.src.core.exception.base import AuthError
-from tests.deps import settings
 from glossary.src.core.services.jwt_auth import AuthJWTService
 
 RND_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2NTY3MTI1MDV9.rfQVhj5-4C0FSpWW2oZeauERW_dstZfMAt2_nai74fs"
