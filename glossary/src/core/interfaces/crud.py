@@ -8,7 +8,7 @@ from glossary.application.database.holder import Base
 ModelType = TypeVar("ModelType", bound=Base)
 EntitySchemaType = TypeVar("EntitySchemaType", bound=BaseModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
-UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
+UpdateSchemaType = TypeVar("UpdateSchemaType", bound=Optional[BaseModel])
 
 class ICRUDASyncBase(ABC):
 

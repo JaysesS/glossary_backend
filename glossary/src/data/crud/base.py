@@ -47,22 +47,30 @@ class CRUDASyncBase(
         await session.refresh(db_obj)
         return self.entity_schema(**db_obj.__dict__)
 
-    async def update(self, session: AsyncSession, *, db_obj: ModelType, obj_in: UpdateSchemaType) -> EntitySchemaType:
+    async def update(self, session: AsyncSession, *, obj_in: UpdateSchemaType) -> EntitySchemaType:
+        stmt = select(self.model).where(
+            self.model.id == obj_in.id # type: ignore
+        )
+        coro = await session.execute(stmt)
+        db_obj = coro.scalar()
+        if db_obj is None:
+            raise CrudError("Not found")
+        update_data = obj_in.dict(exclude={'id'}, exclude_unset=True) # type: ignore
         obj_data = db_obj.__dict__
-        update_data = obj_in.dict(exclude_unset=True)
         for field in obj_data:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
         session.add(db_obj)
         await session.commit()
+        await session.refresh(db_obj)
         return self.entity_schema(**db_obj.__dict__)
 
-    async def delete(self, session: AsyncSession, *, id: int) -> Optional[int]:
+    async def delete(self, session: AsyncSession, *, id: int) -> int:
         stmt = delete(self.model).where(self.model.id == id).returning(self.model.id)
         c = await session.execute(stmt)
         try:
             rm_id, = c.one()
-        except sqlalchemy.exc.NoResultFound:
-            raise CrudError("Entity not found")
+        except sqlalchemy.exc.NoResultFound:  # type: ignore
+            raise CrudError("Not found")
         await session.commit()
         return rm_id

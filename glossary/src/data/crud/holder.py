@@ -4,15 +4,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from glossary.src.data.crud.base import CRUDASyncBase
 from glossary.src.core.exception.base import CrudNotFoundError
-from glossary.src.data.models import UserModel, TagModel, WordModel, WordTagModel
+from glossary.src.data.models import UserModel, TagModel, WordModel, PriorityModel, WordTagModel
 from glossary.src.core.schemas.entity import (
     UserSchema, UserCreateSchema, UserUpdateSchema,
     TagSchema, TagCreateSchema, TagUpdateSchema,
-    WordSchema, WordCreateSchema, WordUpdateSchema
+    WordSchema, WordCreateSchema, WordUpdateSchema,
+    PrioritySchema, PriorityCreateSchema,
 )
 
 class UserCRUD(CRUDASyncBase[UserModel, UserSchema, UserCreateSchema, UserUpdateSchema]):
-    
+
     async def get_by_login(self, session: AsyncSession, *, login: str) -> Optional[UserSchema]:
         stmt = select(self.model).where(
             self.model.login == login
@@ -24,6 +25,11 @@ class UserCRUD(CRUDASyncBase[UserModel, UserSchema, UserCreateSchema, UserUpdate
         return UserSchema(**db_obj.__dict__)
 
 user_crud = UserCRUD(UserModel, UserSchema)
+
+class PriorityCRUD(CRUDASyncBase[PriorityModel, PrioritySchema, PriorityCreateSchema, None]):
+    """ Declare model specific CRUD operation methods. """
+
+priority_crud = PriorityCRUD(PriorityModel, PrioritySchema)
 
 class TagCRUD(CRUDASyncBase[TagModel, TagSchema, TagCreateSchema, TagUpdateSchema]):
     """ Declare model specific CRUD operation methods. """

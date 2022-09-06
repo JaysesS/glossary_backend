@@ -44,8 +44,10 @@ class TagSchema(TimeMixin, BaseModel):
 class TagCreateSchema(BaseModel):
     name: str
     description: Optional[str] = None
+    user_id: int
 
 class TagUpdateSchema(BaseModel):
+    id: int
     name: Optional[str] = None
     description: Optional[str] = None
 
@@ -63,8 +65,10 @@ class WordCreateSchema(BaseModel):
     name: str
     description: Optional[str] = None
     priority_id: int
+    user_id: int
 
 class WordUpdateSchema(BaseModel):
+    id: int
     name: Optional[str] = None
     description: Optional[str] = None
     priority_id: Optional[int] = None
