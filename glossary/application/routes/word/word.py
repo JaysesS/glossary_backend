@@ -83,7 +83,7 @@ async def word_update(
 )
 async def word_delete(
     id: int,
-    user = Depends(auth_user), # just for auth
+    user = Depends(auth_user), 
     session: AsyncSession = Depends(get_session),
 ):
     rm_id = await word_crud.delete(

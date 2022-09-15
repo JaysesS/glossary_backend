@@ -21,7 +21,7 @@ router = APIRouter(
     }
 )
 async def priority_list(
-    _ = Depends(auth_user), # just for auth
+    _ = Depends(auth_user), 
     session: AsyncSession = Depends(get_session),
 ):
     priority_list = await priority_crud.get_many(

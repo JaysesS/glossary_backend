@@ -43,7 +43,7 @@ async def tag_create(
 )
 async def tag_update(
     data: TagUpdateSchema,
-    user = Depends(auth_user), # just for auth
+    user = Depends(auth_user), 
     session: AsyncSession = Depends(get_session),
 ):
     tag = await tag_crud.update(
@@ -62,7 +62,7 @@ async def tag_update(
 )
 async def tag_delete(
     id: int,
-    user = Depends(auth_user), # just for auth
+    user = Depends(auth_user), 
     session: AsyncSession = Depends(get_session),
 ):
     rm_id = await tag_crud.delete(
@@ -82,7 +82,7 @@ async def tag_delete(
 async def tag_list(
     offset: int = 0, 
     limit: int = 100,
-    user = Depends(auth_user), # just for auth
+    user = Depends(auth_user),
     session: AsyncSession = Depends(get_session),
 ):
     tag_list = await tag_crud.get_many(
