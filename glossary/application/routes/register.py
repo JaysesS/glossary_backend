@@ -4,12 +4,14 @@ from glossary.application.routes.user import user
 from glossary.application.routes.priority import priority
 from glossary.application.routes.tag import tag
 from glossary.application.routes.word import word
+from glossary.application.routes.wordtag import wordtag
 
 include = [
     user.router,
     priority.router,
     tag.router,
     word.router,
+    wordtag.router,
 ]
 
 def include_rotes(app: FastAPI, prefix: str = ""):

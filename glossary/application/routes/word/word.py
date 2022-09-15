@@ -13,6 +13,25 @@ router = APIRouter(
     tags=["Word"]
 )
 
+@router.get(
+    "/",
+    responses={
+        200: {"model": WordSchema},
+        400: {"model": HTTPErrorSchema}
+    }
+)
+async def word_get(
+    id: int,
+    user: UserSchema = Depends(auth_user),
+    session: AsyncSession = Depends(get_session),
+):
+    word = await word_crud.get(
+        session,
+        id=id,
+        user_id=user.id
+    )
+    return word
+
 @router.post(
     "/",
     responses={
@@ -45,12 +64,13 @@ async def word_create(
 )
 async def word_update(
     data: WordUpdateSchema,
-    _ = Depends(auth_user), # just for auth
+    user = Depends(auth_user),
     session: AsyncSession = Depends(get_session),
 ):
     word = await word_crud.update(
         session,
-        obj_in=data
+        obj_in=data,
+        user_id=user.id
     )
     return word
 
@@ -63,12 +83,13 @@ async def word_update(
 )
 async def word_delete(
     id: int,
-    _ = Depends(auth_user), # just for auth
+    user = Depends(auth_user), # just for auth
     session: AsyncSession = Depends(get_session),
 ):
     rm_id = await word_crud.delete(
         session,
-        id=id
+        id=id,
+        user_id=user.id
     )
     return DeletedSchema(id=rm_id)
 
@@ -82,11 +103,12 @@ async def word_delete(
 async def word_list(
     offset: int = 0, 
     limit: int = 100,
-    _ = Depends(auth_user), # just for auth
+    user: UserSchema = Depends(auth_user),
     session: AsyncSession = Depends(get_session),
 ):
     word_list = await word_crud.get_many(
         session,
+        user_id=user.id,
         limit=limit,
         offset=offset
     )

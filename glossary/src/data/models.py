@@ -1,5 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, func
-
+from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from glossary.application.database.holder import Base
 from glossary.src.data.mixin import TimeMixin
 
@@ -37,6 +36,11 @@ class WordModel(TimeMixin, Base):
 class WordTagModel(TimeMixin, Base):
     __tablename__ = "word_tags"
 
+    __table_args__ = (
+        UniqueConstraint('word_id', 'tag_id', 'user_id'),
+    )
+
     id = Column(Integer, primary_key=True)
     word_id = Column(Integer, ForeignKey('word.id', ondelete="CASCADE",))
     tag_id = Column(Integer, ForeignKey('tag.id', ondelete="CASCADE",))
+    user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE",), nullable=False)

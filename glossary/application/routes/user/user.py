@@ -48,7 +48,7 @@ async def user_login(
         session,
         login=data.login
     )
-    if user is None:
+    if user is None or user.password != data.password:
         raise AuthError("Invalid credentials")
     token = auth_service.generate_token(
         user_id=user.id

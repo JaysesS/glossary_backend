@@ -29,6 +29,9 @@ class PrioritySchema(TimeMixin, BaseModel):
     id: int
     name: str
 
+    class Config:
+        orm_mode = True
+
 class PriorityCreateSchema(BaseModel):
     name: str
 
@@ -40,6 +43,9 @@ class TagSchema(TimeMixin, BaseModel):
     id: int
     name: str
     description: str
+
+    class Config:
+        orm_mode = True
 
 class TagCreateSchema(BaseModel):
     name: str
@@ -61,6 +67,9 @@ class WordSchema(TimeMixin, BaseModel):
     description: str
     priority_id: int
 
+    class Config:
+        orm_mode = True
+
 class WordCreateSchema(BaseModel):
     name: str
     description: Optional[str] = None
@@ -72,3 +81,20 @@ class WordUpdateSchema(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     priority_id: Optional[int] = None
+
+"""
+    WordTag
+"""
+
+class WordTagSchema(TimeMixin, BaseModel):
+    id: int
+    word_id: int
+    tag_id: int
+
+    class Config:
+        orm_mode = True
+
+class WordTagCreateSchema(BaseModel):
+    word_id: int
+    tag_id: int
+    user_id: int
